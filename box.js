@@ -25,14 +25,14 @@ function Box(x, y, w, h, padding = 0)
 		return this.y;
 	}
 	
-	this.createBox = function(box_text = "", c = color(57, 66, 81), s = 24)
+	this.createBox = function(box_text = "", c = color(48, 55, 66), s = 24)
 	{
 		fill(c);
 		stroke(s);
 		strokeWeight(0.5);
 		rect(this.x, this.y, this.w, this.h, 4);
 		
-		fill(102, 125, 163);
+		fill(110, 123, 145);
 		textSize(20);
 		noStroke();
 		textAlign(CENTER);

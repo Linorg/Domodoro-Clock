@@ -1,69 +1,7 @@
 var domodoroText = "Domodoro Clock";
-var timeAmnt = [0, 0];
-var timeArr = [];
-var timeStr;
 var timeBox;
 var buttons = [];
 var clock;
-var inMin = false;
-var inHour = false;
-var useLocalTime = true;
-var useTimer = false;
-var useStopwatch = false;
-
-function drawTimeSquare()
-{
-	var center_x1 = (timeBox.getX() + timeBox.getWidth() * 0.277);
-	var center_x2 = (timeBox.getX() + timeBox.getWidth() / 2 + 4.8);
-	var center_y = timeBox.getY() + timeBox.getHeight() / 2 - 70 / 2;
-	
-	var w = 40;
-	var h = 70;
-	
-	noStroke();
-	noFill();
-	
-	for(var i = 0; i <= 1; i++)
-	{
-		padding = w * i;
-		rect(center_x1 + padding, center_y, w, h);
-	}
-	for(var j = 0; j <= 1; j++)
-	{
-		padding = w * j;
-		rect(center_x2 + padding, center_y, w, h);
-	}
-	
-	var width1 = center_x1 + ((center_x1 + padding) + w);
-	var width2 = center_x2 + ((center_x2 + padding) + w);
-	var height = center_y + h;
-	
-	if(
-			mouseX < width1 		&&
-			mouseX >= center_x1 &&
-			mouseY < height			&&
-			mouseY >= center_y)
-			{
-				inHour = true;
-			}
-	else
-	{
-		inHour = false;
-	}
-	
-	if(
-			mouseX < width2 		&&
-			mouseX >= center_x2 &&
-			mouseY < height			&&
-			mouseY >= center_y)
-			{
-				inMin = true;
-			}
-	else
-	{
-			inMin = false;
-	}
-}
 
 function DomodoroText(n_text, c, padding = 0)
 {
@@ -74,6 +12,17 @@ function DomodoroText(n_text, c, padding = 0)
 	textAlign(CENTER);
 	textStyle(NORMAL);
 	text(n_text, domo_x + padding, (height / 4) + padding);
+}
+
+function HelpText(n_text)
+{
+	var domo_x = width / 2;
+	fill(82, 102, 135);
+	textSize(38);
+	noStroke();
+	textAlign(CENTER);
+	textStyle(NORMAL);
+	text(n_text, domo_x, (height / 2) + 40);
 }
 
 function setup() 
@@ -95,70 +44,59 @@ function setup()
 function draw() 
 {
 	background(73, 83, 99);
-
 	var domo_c = color(12, 12, 12, 60);
 	DomodoroText(domodoroText, domo_c, 3);
 	
 	var domo_c = color(82, 102, 135);
 	DomodoroText(domodoroText, domo_c);
 	
-	if(!useLocalTime)
+	if(useTimer)
 	{
 		updateTime();
+		setTimer();
+		HelpText("Press enter to start the timer");
 	}
-	else
+	else if(useLocaleTime)
 	{
 		timeStr = new Date().toLocaleTimeString();
+		timeStr2 = "";
+	}
+	else if(useStopwatch)
+	{
+		updateTime();
+		HelpText("Press enter to start the stopwatch");
 	}
 	
 	timeBox.createBox();
 	
-	var shadow_c = color(60, 60, 60, 10);
+	var shadow_c = color(36, 40, 48, 30);
 	shadowBox.createBox("", shadow_c, shadow_c);
 	
 	drawTimeSquare();
 	
-	clock.setText(timeStr);
+	clock.setText(timeStr, timeStr2);
 	clock.Pulsate();
 	
-	var curMousePos = winMouseY;
-	
-	if(mouseIsPressed)
+	for(var i = 0; i < buttons.length; i++)
 	{
-		var oldMousePos = pwinMouseY;
-		var dist = (curMousePos - oldMousePos);
-		if ( dist > 2)
-		{
-			dist = 2
-		}
-		else if (dist < -2)
-		{
-			dist = -2
-		}
-		if(inMin)
-		{
-			timeAmnt[1] -= dist;
-		}
-		else if(inHour)
-		{
-			timeAmnt[0] -= dist;
-		}
-		console.log(dist);
-	}
-	
-	for(var i = 0; i < 3; i++)
-	{
-		var name = ["Timer", "Clock", "Stopwatch"];
-		
-		var c = color(77, 90, 111);
+		var name = ["Timer", "Clock", "Stopwatch", "Reset"];
 		
 		if(!buttons[i].checkCollision())
 		{
 			buttons[i].createBox(name[i]);
 		}
-		else
+		else if(buttons[i].checkCollision())
 		{
-			buttons[i].createBox(name[i], c);
+			if(mouseIsPressed)
+			{
+				var c = color(36, 40, 48);
+				buttons[i].createBox(name[i], c);
+			}
+			else
+			{
+				var c = color(77, 90, 111);
+				buttons[i].createBox(name[i], c);
+			}
 		}
 	}
 }
@@ -166,12 +104,4 @@ function draw()
 function windowResized()
 {
 	resizeCanvas(windowWidth, windowHeight);
-}
-
-function mouseClicked()
-{
-	if(buttons[1].checkCollision())
-	{
-		useLocalTime = true;
-	}
 }
